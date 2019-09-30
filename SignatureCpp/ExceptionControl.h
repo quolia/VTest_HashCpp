@@ -12,7 +12,6 @@ class exception_control
 {
 public:
 	
-
 	exception_control()
 	{
 		_is_exception = false;

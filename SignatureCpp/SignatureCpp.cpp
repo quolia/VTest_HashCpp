@@ -25,6 +25,8 @@ int main(int argc, char* argv[])
 			throw exception("Invalid parameters count. Example parameters: srcfile hashfile [>=1] [md5,crc32]");
 		}
 
+		auto start = chrono::system_clock::now();
+
 		string src_file_name = argv[1];
 		cout << "Source file: " << src_file_name << endl;
 
@@ -64,15 +66,14 @@ int main(int argc, char* argv[])
 		string hash_name = argc > 4 ? argv[4] : "md5";
 		cout << "Hash name: " << hash_name << endl;
 
-		hash_task* hash = nullptr;
-		shared_ptr<hash_task> base_hash_ptr; // Base instance from which all other instances will be created. See [2].
+		shared_ptr<hash_task> proto_task; // Base instance from which all other instances will be created. See [2].
 		if (!_strcmpi(hash_name.c_str(), "md5"))
 		{
-			base_hash_ptr.reset(new hash_task_md5());
+			proto_task.reset(new hash_task_md5());
 		}
 		else if (!_strcmpi(hash_name.c_str(), "crc32"))
 		{
-			base_hash_ptr.reset(new hash_task_crc32());
+			proto_task.reset(new hash_task_crc32());
 		}
 		else
 		{
@@ -81,7 +82,7 @@ int main(int argc, char* argv[])
 
 		task_queue free_tasks;
 
-		int single_hash_size = base_hash_ptr->get_hash_size();
+		int single_hash_size = proto_task->get_hash_size();
 		cout << "Chunk hash size, bytes: " << single_hash_size << endl;
 		cout << "Hash file size, bytes: " << single_hash_size * chunks_in_file << endl;
 
@@ -98,10 +99,9 @@ int main(int argc, char* argv[])
 			{
 				try
 				{
-					shared_ptr<hash_task> task_ptr(base_hash_ptr->new_instance()); // See [2].
+					shared_ptr<hash_task> task_ptr(proto_task->new_instance()); // See [2].
 					task_ptr->create_buffer(chunk_size);
 					memory_allocated += chunk_size;
-
 					free_tasks.add(task_ptr);
 				}
 				catch (const bad_alloc& e)
@@ -155,10 +155,7 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		if (!ec.is_exception())
-		{
-			cout << "Reading completed" << endl;
-		}
+		cout << "Reading completed" << endl;
 
 		for (unsigned i = 0; i < threads.size(); ++i)
 		{
@@ -169,7 +166,8 @@ int main(int argc, char* argv[])
 
 		hash_file.write_bytes(hash_buff, single_hash_size * chunks_in_file);
 
-		cout << "Done" << endl;
+		std::chrono::duration<double> elapsed_seconds = chrono::system_clock::now() - start;
+		cout << "Done in " << elapsed_seconds.count() << " sec, " << src_file_size / 1024 / 1024 / elapsed_seconds.count() << " MB/s" << endl;
 
 		return 0;
 	}

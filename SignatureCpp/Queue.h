@@ -47,7 +47,7 @@ namespace VHASHCPP
 			}
 		}
 
-		int const size()
+		unsigned int const size()
 		{
 			unique_lock<mutex> lock(_lock);
 			return _elements.size();
@@ -70,7 +70,7 @@ namespace VHASHCPP
 			return _queue.wait_and_get();
 		}
 
-		int const size()
+		unsigned int const size()
 		{
 			return _queue.size();
 		}
