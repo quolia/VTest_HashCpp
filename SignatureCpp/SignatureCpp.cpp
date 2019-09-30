@@ -13,8 +13,8 @@ using namespace std;
 int main(int argc, char* argv[])
 {
 	// Restrictions.
-	const unsigned MAX_FREE_TASK_COUNT = 10000;
-	const unsigned long MAX_FREE_TASK_MEMORY = 1024 * 1024 * 1024 * 2UL; // 2GB
+	constexpr unsigned MAX_FREE_TASK_COUNT = 10000;
+	constexpr unsigned long MAX_FREE_TASK_MEMORY = 1024 * 1024 * 1024 * 2UL; // 2GB
 
 	cout << "Started" << endl;
 	
@@ -126,10 +126,11 @@ int main(int argc, char* argv[])
 
 		exception_control ec;
 		vector<task_thread> threads(cpu_count);
-		for (unsigned i = 0; i < threads.size(); ++i)
+		for (auto& thread : threads)
 		{
-			threads[i].start(free_tasks, ec);
+			thread.start(free_tasks, ec);
 		}
+
 		cout << "Threads started" << endl;
 
 		int read = 1;
@@ -157,16 +158,16 @@ int main(int argc, char* argv[])
 
 		cout << "Reading completed" << endl;
 
-		for (unsigned i = 0; i < threads.size(); ++i)
+		for (auto& thread : threads)
 		{
-			threads[i].join();
+			thread.join();
 		}
 
-		ec.try_throw();
+		ec.try_throw(); // Check if any exception occured.
 
 		hash_file.write_bytes(hash_buff, single_hash_size * chunks_in_file);
 
-		std::chrono::duration<double> elapsed_seconds = chrono::system_clock::now() - start;
+		chrono::duration<double> elapsed_seconds = chrono::system_clock::now() - start;
 		cout << "Done in " << elapsed_seconds.count() << " sec, " << src_file_size / 1024 / 1024 / elapsed_seconds.count() << " MB/s" << endl;
 
 		return 0;

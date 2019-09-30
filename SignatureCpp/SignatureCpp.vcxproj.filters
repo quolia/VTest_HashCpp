@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="exe">
+      <UniqueIdentifier>{2bfdea53-f5d5-4f78-8c78-b256828ee8aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="exe\debug">
+      <UniqueIdentifier>{78f9bd3a-3251-4a01-b47b-9bd913ebd6ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="exe\release">
+      <UniqueIdentifier>{1aecd6b4-2b4b-48e7-b4a5-2196b5bd7b96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="doc">
+      <UniqueIdentifier>{7e4acb0d-ac3a-4345-a60a-489de66ad3f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SignatureCpp.cpp">
@@ -35,5 +47,16 @@
     <ClInclude Include="ExceptionControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Debug\hash.exe">
+      <Filter>exe\debug</Filter>
+    </None>
+    <None Include="..\Release\hash.exe">
+      <Filter>exe\release</Filter>
+    </None>
+    <None Include="diagram.drawio">
+      <Filter>doc</Filter>
+    </None>
   </ItemGroup>
 </Project>
