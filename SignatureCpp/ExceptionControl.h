@@ -10,6 +10,10 @@ using namespace std;
 
 class exception_control
 {
+	volatile bool _is_exception;
+	mutex _lock;
+	string _what;
+
 public:
 	
 	exception_control()
@@ -40,12 +44,6 @@ public:
 			throw exception(_what.c_str());
 		}
 	}
-
-private:
-
-	volatile bool _is_exception;
-	mutex _lock;
-	string _what;
 };
 
 #endif // ! _VHASHCPP_EXCC_H_
