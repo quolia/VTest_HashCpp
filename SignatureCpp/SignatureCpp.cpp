@@ -124,11 +124,11 @@ int main(int argc, char* argv[])
 			throw exception("Unable to get CPU count.");
 		}
 
+		exception_control ec;
 		vector<task_thread> threads(cpu_count);
-
 		for (unsigned i = 0; i < threads.size(); ++i)
 		{
-			threads[i].start(free_tasks);
+			threads[i].start(free_tasks, ec);
 		}
 		cout << "Threads started" << endl;
 
@@ -136,6 +136,11 @@ int main(int argc, char* argv[])
 		int chunk_number = 0;
 		while (read > 0)
 		{
+			if (ec.is_exception())
+			{
+				break;
+			}
+
 			auto task = free_tasks.wait_and_get();
 			read = src_file.read_bytes(task->get_buffer(), task->get_buffer_size());
 			if (read > 0)
@@ -150,12 +155,17 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		cout << "Reading completed" << endl;
+		if (!ec.is_exception())
+		{
+			cout << "Reading completed" << endl;
+		}
 
 		for (unsigned i = 0; i < threads.size(); ++i)
 		{
 			threads[i].join();
 		}
+
+		ec.try_throw();
 
 		hash_file.write_bytes(hash_buff, single_hash_size * chunks_in_file);
 

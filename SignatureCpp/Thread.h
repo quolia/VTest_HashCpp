@@ -5,6 +5,7 @@
 #include <thread>
 #include "Queue.h"
 #include "Task.h"
+#include "ExceptionControl.h"
 
 namespace VHASHCPP
 {
@@ -17,9 +18,9 @@ namespace VHASHCPP
 
 	public:
 
-		void start(task_queue& free_tasks)
+		void start(task_queue& free_tasks, exception_control& ec)
 		{
-			_thread.reset(new thread(run, ref(_queue), ref(free_tasks)));
+			_thread.reset(new thread(run, ref(_queue), ref(free_tasks), ref(ec)));
 		}
 
 		void join()
@@ -35,18 +36,25 @@ namespace VHASHCPP
 
 	private:
 
-		static void run(task_queue& queue, task_queue& free_tasks)
+		static void run(task_queue& queue, task_queue& free_tasks, exception_control& ec)
 		{
-			while (true)
+			try
 			{
-				auto task = queue.wait_and_get();
-				if (!task) // See [1].
+				while (!ec.is_exception())
 				{
-					break;
-				}
+					auto task = queue.wait_and_get();
+					if (!task) // See [1].
+					{
+						break;
+					}
 
-				task->do_task();
-				free_tasks.add(task);
+					task->do_task();
+					free_tasks.add(task);
+				}
+			}
+			catch (const exception& e)
+			{
+				ec.set_exception(e);
 			}
 		}
 	};

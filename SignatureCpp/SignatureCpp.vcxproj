@@ -157,6 +157,7 @@
     <ClCompile Include="SignatureCpp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ExceptionControl.h" />
     <ClInclude Include="File.h" />
     <ClInclude Include="Queue.h" />
     <ClInclude Include="Task.h" />
