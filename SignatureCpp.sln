@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29324.140
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SignatureCpp", "SignatureCpp\SignatureCpp.vcxproj", "{35D74E0F-CCF9-48E7-A1A0-1A0D8DDB830B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{35D74E0F-CCF9-48E7-A1A0-1A0D8DDB830B}.Debug|x64.ActiveCfg = Debug|x64
+		{35D74E0F-CCF9-48E7-A1A0-1A0D8DDB830B}.Debug|x64.Build.0 = Debug|x64
+		{35D74E0F-CCF9-48E7-A1A0-1A0D8DDB830B}.Debug|x86.ActiveCfg = Debug|Win32
+		{35D74E0F-CCF9-48E7-A1A0-1A0D8DDB830B}.Debug|x86.Build.0 = Debug|Win32
+		{35D74E0F-CCF9-48E7-A1A0-1A0D8DDB830B}.Release|x64.ActiveCfg = Release|x64
+		{35D74E0F-CCF9-48E7-A1A0-1A0D8DDB830B}.Release|x64.Build.0 = Release|x64
+		{35D74E0F-CCF9-48E7-A1A0-1A0D8DDB830B}.Release|x86.ActiveCfg = Release|Win32
+		{35D74E0F-CCF9-48E7-A1A0-1A0D8DDB830B}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3D7083F9-BC89-473C-8038-BD5BE25A4D0C}
+	EndGlobalSection
+EndGlobal
