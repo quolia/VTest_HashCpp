@@ -132,6 +132,7 @@ int main(int argc, char* argv[])
 		}
 
 		cout << "Threads started" << endl;
+		cout << "Working..." << endl;
 
 		int read = 1;
 		int chunk_number = 0;
