@@ -167,6 +167,7 @@
     <ClInclude Include="Task.h" />
     <ClInclude Include="TaskFactory.h" />
     <ClInclude Include="Thread.h" />
+    <ClInclude Include="Types.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Debug\hash.exe" />

@@ -42,6 +42,9 @@
     <ClInclude Include="TaskFactory.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Debug\hash.exe">

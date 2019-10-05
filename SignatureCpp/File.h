@@ -62,7 +62,7 @@ namespace VHASHCPP
 				throw exception("File is not for read.");
 			}
 
-			return fread(dst, sizeof(unsigned char), count, _file);
+			return fread(dst, sizeof(byte), count, _file);
 		}
 
 		void write_bytes(void* dst, size_t count)
@@ -77,7 +77,7 @@ namespace VHASHCPP
 				throw exception("File is not for write.");
 			}
 
-			fwrite(dst, sizeof(unsigned char), count, _file);
+			fwrite(dst, sizeof(byte), count, _file);
 		}
 
 		long long const size()

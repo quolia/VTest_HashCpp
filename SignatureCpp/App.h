@@ -4,12 +4,12 @@
 
 #include <iostream>
 #include <string>
-#include <boost/scoped_array.hpp>
 #include "File.h"
 #include "CLI.h"
 #include "TaskFactory.h"
 #include "Queue.h"
 #include "Thread.h"
+#include "Types.h"
 
 namespace VHASHCPP
 {
@@ -23,7 +23,7 @@ namespace VHASHCPP
 		unsigned _max_free_task_count;
 		unsigned long long _max_free_task_memory;
 
-		boost::scoped_array<unsigned char> _hash_file_buff;
+		shared_ptr<byte_array> _hash_file_buff;
 		task_queue _free_tasks;
 
 		binary_file _src_file;
@@ -150,7 +150,7 @@ namespace VHASHCPP
 				read = _src_file.read_bytes(task->get_buffer(), task->get_buffer_size());
 				if (read > 0)
 				{
-					task->init(read, _hash_file_buff.get() + chunk_number * single_hash_size);
+					task->init(read, _hash_file_buff->get() + chunk_number * single_hash_size);
 					threads.add_task(chunk_number, task);
 					++chunk_number;
 				}
@@ -179,12 +179,12 @@ namespace VHASHCPP
 			}
 
 			// Create buffer for output file.
-			_hash_file_buff.reset(new unsigned char[_proto_task->get_hash_size() * _chunks_in_source_file]);
+			_hash_file_buff.reset(new byte_array(_proto_task->get_hash_size() * _chunks_in_source_file));
 
 			// Allocate as much tasks as possible.
 			
 			// Reserve some memory to leave it to the system.
-			boost::scoped_array<unsigned char> reserve_ptr(new unsigned char[50 * 1024 * 1024]);
+			byte_array reserve(50 * 1024 * 1024);
 
 			_free_tasks.clear();
 

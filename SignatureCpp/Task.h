@@ -5,6 +5,7 @@
 #include <memory>
 #include <boost/uuid/detail/md5.hpp>
 #include <boost/crc.hpp>
+#include "Types.h"
 
 namespace VHASHCPP
 {
@@ -19,13 +20,13 @@ namespace VHASHCPP
 		unsigned _buffer_size;
 
 		// Smart-pointer to delete chunk buffer.
-		boost::scoped_array<unsigned char> _buffer_ptr;
+		shared_ptr<byte_array> _buffer_ptr;
 
 		// Actual data size.
 		unsigned _actual_data_size;
 
 		// Destination address to save hash.
-		unsigned char* _dst_buffer;
+		byte* _dst_buffer;
 
 	public:
 
@@ -44,12 +45,12 @@ namespace VHASHCPP
 		void create_buffer(unsigned buffer_size)
 		{
 			_buffer_size = buffer_size;
-			_buffer_ptr.reset(new unsigned char[buffer_size]);
+			_buffer_ptr.reset(new byte_array(buffer_size));
 		}
 
-		unsigned char* const get_buffer()
+		byte* const get_buffer()
 		{
-			return _buffer_ptr.get();
+			return _buffer_ptr->get();
 		}
 
 		unsigned const get_buffer_size()
@@ -58,7 +59,7 @@ namespace VHASHCPP
 		}
 
 		// Init task with actual data size and destination buffer.
-		void init(unsigned data_size, unsigned char* dst_buffer)
+		void init(unsigned data_size, byte* dst_buffer)
 		{
 			_actual_data_size = data_size;
 			_dst_buffer = dst_buffer;
@@ -94,7 +95,7 @@ namespace VHASHCPP
 
 			md5 hash; 
 
-			hash.process_bytes(_buffer_ptr.get(), _actual_data_size);
+			hash.process_bytes(_buffer_ptr->get(), _actual_data_size);
 			hash.get_digest(_digest);
 
 			memcpy(_dst_buffer, reinterpret_cast<const char*>(&_digest), get_hash_size());
@@ -124,7 +125,7 @@ namespace VHASHCPP
 		virtual void do_task()
 		{
 			boost::crc_32_type result;
-			result.process_bytes(_buffer_ptr.get(), _actual_data_size);
+			result.process_bytes(_buffer_ptr->get(), _actual_data_size);
 			unsigned int crc32 = result.checksum();
 
 			memcpy(_dst_buffer, reinterpret_cast<const char*>(&crc32), get_hash_size());
