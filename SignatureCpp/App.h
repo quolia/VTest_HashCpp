@@ -137,13 +137,8 @@ namespace VHASHCPP
 
 			int read = 1;
 			unsigned chunk_number = 0;
-			while (read > 0)
+			while (read > 0 && !_exception_control->is_exception())
 			{
-				if (_exception_control->is_exception())
-				{
-					break;
-				}
-
 				auto task = _free_tasks->wait_and_get();
 				read = _src_file->read_bytes(task->get_buffer(), task->get_buffer_size());
 				if (read > 0)
