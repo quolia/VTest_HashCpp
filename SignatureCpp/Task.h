@@ -2,6 +2,7 @@
 #ifndef  _VHASHCPP_TASK_H_
 #define _VHASHCPP_TASK_H_
 
+#include <memory>
 #include <boost/uuid/detail/md5.hpp>
 #include <boost/crc.hpp>
 
@@ -9,19 +10,19 @@ namespace VHASHCPP
 {
 	using boost::uuids::detail::md5;
 
-	// Base class for hash-function task
+	// Base class for hash-function tasks.
 	class hash_task
 	{
 	protected:
 
 		// Size of buffer to store data to hash.
-		int _buffer_size;
+		unsigned _buffer_size;
 
 		// Smart-pointer to delete chunk buffer.
 		boost::scoped_array<unsigned char> _buffer_ptr;
 
 		// Actual data size.
-		int _actual_data_size;
+		unsigned _actual_data_size;
 
 		// Destination address to save hash.
 		unsigned char* _dst_buffer;
@@ -29,7 +30,7 @@ namespace VHASHCPP
 	public:
 
 		virtual void do_task() = 0;
-		virtual int get_hash_size() = 0;
+		virtual unsigned get_hash_size() = 0;
 		virtual hash_task* new_instance() = 0;
 		virtual ~hash_task() {};
 
@@ -40,7 +41,7 @@ namespace VHASHCPP
 			_dst_buffer = nullptr;
 		}
 
-		void create_buffer(int buffer_size)
+		void create_buffer(unsigned buffer_size)
 		{
 			_buffer_size = buffer_size;
 			_buffer_ptr.reset(new unsigned char[buffer_size]);
@@ -51,13 +52,13 @@ namespace VHASHCPP
 			return _buffer_ptr.get();
 		}
 
-		int const get_buffer_size()
+		unsigned const get_buffer_size()
 		{
 			return _buffer_size;
 		}
 
-		// Init task with actal data size and destination buffer.
-		void init(int data_size, unsigned char* dst_buffer)
+		// Init task with actual data size and destination buffer.
+		void init(unsigned data_size, unsigned char* dst_buffer)
 		{
 			_actual_data_size = data_size;
 			_dst_buffer = dst_buffer;
@@ -71,12 +72,17 @@ namespace VHASHCPP
 
 	public:
 
+		static const char* name()
+		{
+			return "md5";
+		}
+
 		virtual hash_task* new_instance()
 		{
 			return new hash_task_md5();
 		}
 
-		virtual int get_hash_size()
+		virtual unsigned get_hash_size()
 		{
 			return sizeof(_digest);
 		}
@@ -100,12 +106,17 @@ namespace VHASHCPP
 	{
 	public:
 
+		static const char* name()
+		{
+			return "crc32";
+		}
+
 		virtual hash_task* new_instance()
 		{
 			return new hash_task_crc32();
 		}
 
-		virtual int get_hash_size()
+		virtual unsigned get_hash_size()
 		{
 			return 4;
 		}

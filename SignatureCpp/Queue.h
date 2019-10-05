@@ -34,23 +34,32 @@ namespace VHASHCPP
 			
 			while (true)
 			{
-				if (!_elements.empty())
+				if (_elements.empty())
+				{
+					_cv.wait(lock);
+				}
+				else
 				{
 					T el = _elements.front();
 					_elements.pop();
 					return el;
 				}
-				else
-				{
-					_cv.wait(lock);
-				}
 			}
 		}
 
-		unsigned int const size()
+		unsigned const size()
 		{
 			unique_lock<mutex> lock(_lock);
 			return _elements.size();
+		}
+
+		void clear()
+		{
+			unique_lock<mutex> lock(_lock);
+			while (!_elements.empty())
+			{
+				_elements.pop();
+			}
 		}
 	};
 
@@ -70,9 +79,14 @@ namespace VHASHCPP
 			return _queue.wait_and_get();
 		}
 
-		unsigned int const size()
+		unsigned const size()
 		{
 			return _queue.size();
+		}
+
+		void clear()
+		{
+			_queue.clear();
 		}
 	};
 }

@@ -33,6 +33,15 @@
     <ClInclude Include="Thread.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="CLI.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="App.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskFactory.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Debug\hash.exe">

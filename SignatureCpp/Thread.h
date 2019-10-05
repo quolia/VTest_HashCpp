@@ -15,23 +15,54 @@ namespace VHASHCPP
 	{
 		shared_ptr<thread> _thread;
 		task_queue _queue;
+		bool _is_started;
 
 	public:
 
+		task_thread()
+		{
+			_is_started = false;
+		}
+
+		~task_thread()
+		{
+			join();
+		}
+
+		bool const is_started()
+		{
+			return _is_started;
+		}
+
 		void start(task_queue& free_tasks, exception_control& ec)
 		{
+			if (is_started())
+			{
+				throw exception("The thread has been already started.");
+			}
+
 			_thread.reset(new thread(run, ref(_queue), ref(free_tasks), ref(ec)));
+			_is_started = true;
 		}
 
 		void join()
 		{
-			add_task(nullptr); // Tell thread to exit while-loop. See [1].
-			_thread->join();
+			if (is_started())
+			{
+				add_task(nullptr); // Tell thread to exit while-loop. See [1].
+				_thread->join();
+				_is_started = false;
+			}
 		}
 
-		void add_task(const shared_ptr<hash_task> task)
+		void add_task(const shared_ptr<hash_task>& task)
 		{
 			_queue.add(task);
+		}
+
+		void clear_tasks()
+		{
+			_queue.clear();
 		}
 
 	private:
@@ -56,6 +87,67 @@ namespace VHASHCPP
 			{
 				ec.set_exception(e);
 			}
+		}
+	};
+
+	class task_threads
+	{
+		vector<shared_ptr<task_thread>> _threads;
+
+	public:
+
+		task_threads()
+		{
+			// default ctor
+		}
+
+		task_threads(unsigned count, task_queue& free_tasks, exception_control& ec)
+		{
+			init(count);
+			start(free_tasks, ec);
+		}
+
+		~task_threads()
+		{
+			join();
+		}
+
+		void init(unsigned count)
+		{
+			join();
+			_threads.clear();
+			_threads.reserve(count);
+			for (unsigned i = 0; i < count; ++i)
+			{
+				shared_ptr<task_thread> ptr(new task_thread);
+				_threads.push_back(ptr);
+			}
+		}
+
+		void start(task_queue& free_tasks, exception_control& ec)
+		{
+			for (auto& thread : _threads)
+			{
+				thread->start(free_tasks, ec);
+			}
+		}
+
+		void join()
+		{
+			for (auto& thread : _threads)
+			{
+				thread->join();
+			}
+		}
+
+		void add_task(unsigned thread_number, const shared_ptr<hash_task>& task)
+		{
+			if (_threads.empty())
+			{
+				throw exception("None threads have been created yet.");
+			}
+
+			_threads[thread_number % _threads.size()]->add_task(task);
 		}
 	};
 }

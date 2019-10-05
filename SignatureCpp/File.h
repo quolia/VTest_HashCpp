@@ -15,6 +15,7 @@ namespace VHASHCPP
 		FILE* _file;
 		string _name;
 		bool _for_read;
+		long long _size;
 
 	public:
 
@@ -22,9 +23,15 @@ namespace VHASHCPP
 		{
 			_file = nullptr;
 			_for_read = true;
+			_size = -1;
 		}
 
 		~binary_file()
+		{
+			close();
+		}
+
+		void close()
 		{
 			if (_file)
 			{
@@ -43,18 +50,28 @@ namespace VHASHCPP
 			open(file_name, false);
 		}
 
-		int read_bytes(void* src, int count)
+		int read_bytes(void* dst, size_t count)
 		{
+			if (!is_opened())
+			{
+				throw exception("File is not opened.");
+			}
+
 			if (!_for_read)
 			{
 				throw exception("File is not for read.");
 			}
 
-			return fread(src, sizeof(unsigned char), count, _file);
+			return fread(dst, sizeof(unsigned char), count, _file);
 		}
 
-		void write_bytes(void* dst, int count)
+		void write_bytes(void* dst, size_t count)
 		{
+			if (!is_opened())
+			{
+				throw exception("File is not opened.");
+			}
+
 			if (_for_read)
 			{
 				throw exception("File is not for write.");
@@ -65,28 +82,44 @@ namespace VHASHCPP
 
 		long long const size()
 		{
-			if (!_file)
+			if (!is_opened())
 			{
 				throw exception("File is not opened.");
 			}
+			else if (_size >= 0)
+			{
+				return _size;
+			}
 			else
 			{
+				_size = -1;
+
 				streampos fsize = 0;
 				ifstream myfile(_name.c_str(), ios::in);
 				fsize = myfile.tellg();
 				myfile.seekg(0, ios::end);
 				fsize = myfile.tellg() - fsize;
 				myfile.close();
+
+				_size = fsize;
 				return fsize;
 			}
+		}
+
+		bool const is_opened()
+		{
+			return _file;
 		}
 
 	protected:
 
 		void open(const string& file_name, bool for_read)
 		{
+			close();
+	
 			_name = file_name;
 			_for_read = for_read;
+			_size = -1;
 			_file = fopen(file_name.c_str(), for_read ? "rb" : "wb");
 			if (!_file)
 			{
