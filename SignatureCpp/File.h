@@ -4,6 +4,7 @@
 
 #include <string>
 #include <fstream>
+#include <cstddef>
 
 namespace VHASHCPP
 {

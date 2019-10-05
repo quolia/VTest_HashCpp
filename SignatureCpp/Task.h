@@ -17,7 +17,7 @@ namespace VHASHCPP
 	protected:
 
 		// Size of buffer to store data to hash.
-		unsigned _buffer_size;
+		size_t _buffer_size;
 
 		// Smart-pointer to delete chunk buffer.
 		shared_ptr<byte_array> _buffer_ptr;
@@ -25,13 +25,16 @@ namespace VHASHCPP
 		// Actual data size.
 		unsigned _actual_data_size;
 
-		// Destination address to save hash.
-		byte* _dst_buffer;
+		// Destination array to save hash.
+		shared_ptr<byte_array> _dst_buffer;
+
+		// Destination array offset/
+		size_t _dst_buffer_offset;
 
 	public:
 
 		virtual void do_task() = 0;
-		virtual unsigned get_hash_size() = 0;
+		virtual size_t get_hash_size() = 0;
 		virtual hash_task* new_instance() = 0;
 		virtual ~hash_task() {};
 
@@ -42,7 +45,7 @@ namespace VHASHCPP
 			_dst_buffer = nullptr;
 		}
 
-		void create_buffer(unsigned buffer_size)
+		void create_buffer(size_t buffer_size)
 		{
 			_buffer_size = buffer_size;
 			_buffer_ptr.reset(new byte_array(buffer_size));
@@ -50,19 +53,20 @@ namespace VHASHCPP
 
 		byte* const get_buffer()
 		{
-			return _buffer_ptr->get();
+			return _buffer_ptr->buffer();
 		}
 
-		unsigned const get_buffer_size()
+		size_t const get_buffer_size()
 		{
 			return _buffer_size;
 		}
 
 		// Init task with actual data size and destination buffer.
-		void init(unsigned data_size, byte* dst_buffer)
+		void init(unsigned data_size, shared_ptr<byte_array>& dst_buffer, size_t offset)
 		{
 			_actual_data_size = data_size;
 			_dst_buffer = dst_buffer;
+			_dst_buffer_offset = offset;
 		}
 	};
 
@@ -83,7 +87,7 @@ namespace VHASHCPP
 			return new hash_task_md5();
 		}
 
-		virtual unsigned get_hash_size()
+		virtual size_t get_hash_size()
 		{
 			return sizeof(_digest);
 		}
@@ -95,10 +99,10 @@ namespace VHASHCPP
 
 			md5 hash; 
 
-			hash.process_bytes(_buffer_ptr->get(), _actual_data_size);
+			hash.process_bytes(_buffer_ptr->buffer(), _actual_data_size);
 			hash.get_digest(_digest);
 
-			memcpy(_dst_buffer, reinterpret_cast<const char*>(&_digest), get_hash_size());
+			_dst_buffer->write(_dst_buffer_offset, reinterpret_cast<const char*>(&_digest), get_hash_size());
 		}
 	};
 
@@ -117,7 +121,7 @@ namespace VHASHCPP
 			return new hash_task_crc32();
 		}
 
-		virtual unsigned get_hash_size()
+		virtual size_t get_hash_size()
 		{
 			return 4;
 		}
@@ -125,10 +129,10 @@ namespace VHASHCPP
 		virtual void do_task()
 		{
 			boost::crc_32_type result;
-			result.process_bytes(_buffer_ptr->get(), _actual_data_size);
+			result.process_bytes(_buffer_ptr->buffer(), _actual_data_size);
 			unsigned int crc32 = result.checksum();
 
-			memcpy(_dst_buffer, reinterpret_cast<const char*>(&crc32), get_hash_size());
+			_dst_buffer->write(_dst_buffer_offset, reinterpret_cast<const char*>(&crc32), get_hash_size());
 		}
 	};
 }

@@ -13,17 +13,15 @@ namespace VHASHCPP
 	{
 	public:
 
-		static shared_ptr<hash_task> new_instance_by_name(const char* name)
+		static hash_task* new_instance_by_name(const char* name)
 		{
 			if (!_strcmpi(name, hash_task_md5::name()))
 			{
-				shared_ptr<hash_task> task(new hash_task_md5());
-				return task;
+				return new hash_task_md5();
 			}
 			else if (!_strcmpi(name, hash_task_crc32::name()))
 			{
-				shared_ptr<hash_task> task(new hash_task_crc32());
-				return task;
+				return new hash_task_crc32();
 			}
 
 			throw exception("Unsupported hash name.");

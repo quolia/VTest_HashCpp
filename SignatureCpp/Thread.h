@@ -14,7 +14,7 @@ namespace VHASHCPP
 	class task_thread
 	{
 		shared_ptr<thread> _thread;
-		task_queue _queue;
+		shared_ptr<task_queue> _queue;
 		bool _is_started;
 
 	public:
@@ -22,6 +22,7 @@ namespace VHASHCPP
 		task_thread()
 		{
 			_is_started = false;
+			_queue.reset(new task_queue());
 		}
 
 		~task_thread()
@@ -34,7 +35,7 @@ namespace VHASHCPP
 			return _is_started;
 		}
 
-		void start(task_queue& free_tasks, exception_control& ec)
+		void start(shared_ptr<task_queue>& free_tasks, shared_ptr<exception_control>& ec)
 		{
 			if (is_started())
 			{
@@ -57,35 +58,35 @@ namespace VHASHCPP
 
 		void add_task(const shared_ptr<hash_task>& task)
 		{
-			_queue.add(task);
+			_queue->add(task);
 		}
 
 		void clear_tasks()
 		{
-			_queue.clear();
+			_queue->clear();
 		}
 
 	private:
 
-		static void run(task_queue& queue, task_queue& free_tasks, exception_control& ec)
+		static void run(shared_ptr<task_queue>& queue, shared_ptr<task_queue>& free_tasks, shared_ptr<exception_control>& ec)
 		{
 			try
 			{
-				while (!ec.is_exception())
+				while (!ec->is_exception())
 				{
-					auto task = queue.wait_and_get();
+					auto task = queue->wait_and_get();
 					if (!task) // See [1].
 					{
 						break;
 					}
 
 					task->do_task();
-					free_tasks.add(task);
+					free_tasks->add(task);
 				}
 			}
 			catch (const exception& e)
 			{
-				ec.set_exception(e);
+				ec->set_exception(e);
 			}
 		}
 	};
@@ -96,36 +97,15 @@ namespace VHASHCPP
 
 	public:
 
-		task_threads()
-		{
-			// default ctor
-		}
-
-		task_threads(unsigned count, task_queue& free_tasks, exception_control& ec)
-		{
-			init(count);
-			start(free_tasks, ec);
-		}
-
 		~task_threads()
 		{
 			join();
 		}
 
-		void init(unsigned count)
+		void start(unsigned count, shared_ptr<task_queue>& free_tasks, shared_ptr<exception_control>& ec)
 		{
-			join();
-			_threads.clear();
-			_threads.reserve(count);
-			for (unsigned i = 0; i < count; ++i)
-			{
-				shared_ptr<task_thread> ptr(new task_thread);
-				_threads.push_back(ptr);
-			}
-		}
+			init(count);
 
-		void start(task_queue& free_tasks, exception_control& ec)
-		{
 			for (auto& thread : _threads)
 			{
 				thread->start(free_tasks, ec);
@@ -148,6 +128,20 @@ namespace VHASHCPP
 			}
 
 			_threads[thread_number % _threads.size()]->add_task(task);
+		}
+
+	private:
+
+		void init(unsigned count)
+		{
+			join();
+			_threads.clear();
+			_threads.reserve(count);
+			for (unsigned i = 0; i < count; ++i)
+			{
+				shared_ptr<task_thread> ptr(new task_thread);
+				_threads.push_back(ptr);
+			}
 		}
 	};
 }
