@@ -109,6 +109,14 @@ namespace VHASHCPP
 			}
 			cout << "Hash file size, bytes: " << single_hash_size * chunks_in_source_file << endl;
 
+			unsigned cpu_count = thread::hardware_concurrency();
+			cout << "Threads count: " << cpu_count << endl;
+			if (cpu_count < 1)
+			{
+				throw exception("Unable to get CPUs count.");
+			}
+			_threads->init(cpu_count);
+
 			allocate_tasks(chunks_in_source_file, chunk_size_bytes, max_free_task_count, max_free_task_memory);
 
 			_is_inited = true;
@@ -121,14 +129,7 @@ namespace VHASHCPP
 				throw exception("Application has not been inited yet.");
 			}
 
-			unsigned cpu_count = thread::hardware_concurrency();
-			cout << "Threads count: " << cpu_count << endl;
-			if (cpu_count < 1)
-			{
-				throw exception("Unable to get CPUs count.");
-			}
-
-			_threads->start(cpu_count, _free_tasks, _exception_control);
+			_threads->start(_free_tasks, _exception_control);
 
 			cout << "Threads started" << endl;
 			cout << "Working..." << endl;
