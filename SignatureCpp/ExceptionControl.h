@@ -30,6 +30,7 @@ namespace VHASHCPP
 		void set_exception(const exception& e)
 		{
 			lock_guard<mutex> lock(_lock);
+
 			if (!_is_exception)
 			{
 				_is_exception = true;
@@ -40,6 +41,7 @@ namespace VHASHCPP
 		void try_throw()
 		{
 			lock_guard<mutex> lock(_lock);
+
 			if (_is_exception)
 			{
 				throw exception(_what.c_str());

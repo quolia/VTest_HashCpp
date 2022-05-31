@@ -24,6 +24,7 @@ namespace VHASHCPP
 		void add(T el)
 		{
 			unique_lock<mutex> lock(_lock);
+
 			_elements.push(el);
 			_cv.notify_one();
 		}
@@ -42,6 +43,7 @@ namespace VHASHCPP
 				{
 					T el = _elements.front();
 					_elements.pop();
+
 					return el;
 				}
 			}
@@ -56,6 +58,7 @@ namespace VHASHCPP
 		void clear()
 		{
 			unique_lock<mutex> lock(_lock);
+
 			while (!_elements.empty())
 			{
 				_elements.pop();

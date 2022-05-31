@@ -28,7 +28,7 @@ namespace VHASHCPP
 		// Destination array to save hash.
 		shared_ptr<byte_array> _dst_buffer;
 
-		// Destination array offset/
+		// Destination array offset.
 		size_t _dst_buffer_offset;
 
 	public:
@@ -130,8 +130,8 @@ namespace VHASHCPP
 		{
 			boost::crc_32_type result;
 			result.process_bytes(_buffer_ptr->buffer(), _actual_data_size);
-			unsigned int crc32 = result.checksum();
 
+			unsigned int crc32 = result.checksum();
 			_dst_buffer->write(_dst_buffer_offset, reinterpret_cast<const char*>(&crc32), get_hash_size());
 		}
 	};

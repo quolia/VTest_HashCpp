@@ -105,8 +105,10 @@ namespace VHASHCPP
 		void init(unsigned count)
 		{
 			join();
+
 			_threads.clear();
 			_threads.reserve(count);
+
 			for (unsigned i = 0; i < count; ++i)
 			{
 				shared_ptr<task_thread> ptr(new task_thread);
